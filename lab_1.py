@@ -9,6 +9,6 @@ while flag:
     except ValueError:
         pass
     finally:
-        if not flag:
+        if  flag:
             print('Wrong year')
 print(myDict)
