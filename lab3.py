@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def connect_to_db():
     """Создание подключения к базе данных"""
-    conn_sql = sqlite3.connect('populationdb.db')
+    conn_sql = sqlite3.connect('databases/populationdb.db')
     cursor_sql = conn_sql.cursor()
     return cursor_sql, conn_sql
 
@@ -23,12 +23,12 @@ def create_tables(dbcursor, dbconnection):
     except sqlite3.OperationalError:
         print('Tables don''t dropped')
 
-    # создание таблицы- справочника стран
+    # создание таблицы-справочника стран
     dbcursor.execute(
         'create table countries(id INTEGER PRIMARY KEY AUTOINCREMENT, code text, name text, capital_name text,'
         'continent text)')
 
-    # создание таблицы- справочника периодов
+    # создание таблицы-справочника периодов
     dbcursor.execute('create table periods(id INTEGER PRIMARY KEY AUTOINCREMENT, fact_year Integer)')
 
     # создание таблицы фактов
@@ -40,13 +40,13 @@ def create_tables(dbcursor, dbconnection):
 
 
 def get_countries_id(dbcursor, dbconnection, country_code, country_name, country_capital, country_continent):
-    """функция для получения первичного ключа страны"""
+    """Функция для получения первичного ключа страны"""
     # ищем в таблице нужную запись
     dbcursor.execute('select id from countries where code = ? and name = ? and capital_name = ? and continent = ?',
                      (country_code, country_name, country_capital, country_continent))
     country_id = dbcursor.fetchone()
     if country_id is None:
-        # если не нашли - добавляем и рекурсивно обращаемся к этой же функции чтобы забрать ID
+        # если не нашли - добавляем и рекурсивно обращаемся к этой же функции, чтобы забрать ID
         dbcursor.execute('insert into countries (code, name, capital_name, continent)values(?, ?, ?, ?)',
                          (country_code, country_name, country_capital, country_continent))
         dbconnection.commit()
@@ -58,12 +58,12 @@ def get_countries_id(dbcursor, dbconnection, country_code, country_name, country
 
 
 def get_periods_id(dbcursor, dbconnection, year):
-    """функция для получения первичного ключа периода"""
+    """Функция для получения первичного ключа периода"""
     # ищем в таблице нужную запись
     dbcursor.execute('select id from periods where fact_year = ?', (year,))
     periods_id = dbcursor.fetchone()
     if periods_id is None:
-        # если не нашли - добавляем и рекурсивно обращаемся к этой же функции чтобы забрать ID
+        # если не нашли - добавляем и рекурсивно обращаемся к этой же функции, чтобы забрать ID
         dbcursor.execute('insert into periods (fact_year) values (?)', (year,))
         dbconnection.commit()
         return get_periods_id(dbcursor, dbconnection, year)
@@ -74,10 +74,10 @@ def get_periods_id(dbcursor, dbconnection, year):
 
 def inidata(dbcursor, dbconnection):
     """загрузка данных из csv датаасета в базу данных"""
-    # справочник для маппинга данных в csv (соответсвтвие столбца году)
+    # справочник для маппинга данных в csv (соответствие столбца году)
     mapping_csv = {'2022': 5, '2020': 6, '2015': 7, '2010': 8, '2000': 9, '1990': 10, '1980': 11, '1970': 12}
     # читаем файл
-    with open('world_population.csv', "r", encoding='utf-8') as csvfile:
+    with open('datasets/world_population.csv', "r", encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         # пропускаем заголовок
         next(reader, None)
@@ -105,7 +105,7 @@ def inidata(dbcursor, dbconnection):
 
 
 def show_full_data(dbconnection):
-    """функция для отобрвжения всего содержимого базы данных"""
+    """Функция для отображения всего содержимого базы данных"""
     # выполняем запрос
     population = pd.read_sql_query(
         'select countries.name, periods.fact_year, population.population '
@@ -119,7 +119,7 @@ def show_full_data(dbconnection):
 
 
 def show_country_code_data(dbcursor):
-    """метод для выпечатки справочника стран"""
+    """Метод для выпечатки справочника стран"""
     # выполняем запрос
     dbcursor.execute('select * from countries')
     # забираем данные из курсора
@@ -130,7 +130,7 @@ def show_country_code_data(dbcursor):
 
 
 def show_country_data(dbconnection, country_code):
-    """функция для отображения данных по конкретной стране"""
+    """Функция для отображения данных по конкретной стране"""
     # выполняем запрос
     population = pd.read_sql_query(
         'select countries.name, periods.fact_year, population.population '
@@ -145,7 +145,7 @@ def show_country_data(dbconnection, country_code):
 
 
 def show_continent_data(dbconnection):
-    """функция отображения аггрегатов по континентам """
+    """Функция отображения аггрегатов по континентам """
     # выполняем запрос
     population = pd.read_sql_query(
         'select countries.continent, periods.fact_year, sum(population.population) as population '
