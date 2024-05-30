@@ -1,11 +1,3 @@
-# train_cols = ['fBodyAccJerk-bandsEnergy()-1,8', 'tBodyGyroJerk-iqr()-Z', 'tGravityAcc-min()-X',
-#               'tBodyAccJerk-energy()-X',
-#               'tBodyAccJerk-mad()-X', 'tGravityAcc-mean()-X', 'tGravityAcc-arCoeff()-Z,2',
-#               'fBodyAccMag-std()',
-#               'tGravityAcc-arCoeff()-Y,1',
-#               'angle(Y,gravityMean)',
-#               'tGravityAcc-energy()-X'
-#               ]
 
 output_file = 'log/output.log'
 # Тренировочный набор данных
