@@ -11,11 +11,12 @@ import lightgbm as lgb
 from sklearn.svm import SVC
 import xgboost as xgb
 from sklearn.tree import DecisionTreeClassifier
-from contextlib import redirect_stdout
 
-import const.lab4Const as CONST
-import time
-from datetime import datetime
+
+
+from util import time_logger, DLlogger
+import const.ds_const as CONST
+
 
 # сразу определяю дата фреймы как глобальные, чтобы потом не перегружать
 df_train = None  # Тренировочный датасет
@@ -23,41 +24,6 @@ df_test = None  # Тестовый датасет
 
 relevant_columns = []
 feature_columns = []
-
-
-
-class DLlogger(object):
-    """Логгер для вывода в файл"""
-    def __init__(self, fn='', tofile=False):
-	    self.fn = fn
-	    self.tofile = tofile
-	    return
-    def printml(self, *args):
-        toprint = ''
-        for v in args:
-            toprint = toprint + str(v) + ' '
-        if self.tofile:
-            f = open(self.fn, 'a')
-            f.write(toprint + "\n")
-            f.close()
-        else: print(toprint)
-        return
-
-
-
-def time_logger(func):
-    """Простой декоратор, нужен только для логирования времени."""
-
-    def wrap(*args, **kwargs):
-        start = time.time()
-        print(f'Выполнение функции "{CONST.func_description[func.__name__]}" начало:{datetime.now()}')
-        result = func(*args, **kwargs)
-        end = time.time()
-        print(f'Выполнение функции "{CONST.func_description[func.__name__]}" завершение: {datetime.now()}')
-        print(f'Выполнение функции "{CONST.func_description[func.__name__]}" длительность: {end - start}')
-        return result
-
-    return wrap
 
 
 def load_data(train_file, test_file):
@@ -310,7 +276,7 @@ if __name__ == '__main__':
     print = log.printml
 
     # Загружаем данные из файла
-    load_data(CONST.train_file, CONST.test_file)
+    load_data(CONST.train_file4lab, CONST.test_file4lab)
     # Собираем статистику по датасету
     print('Статистика тренировочного дата сета')
     check_dataset(df_train)

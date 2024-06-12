@@ -1,9 +1,15 @@
-
 output_file = 'log/output.log'
 # Тренировочный набор данных
-train_file = 'datasets/train.csv'
+train_file4lab = 'datasets/train.csv'
 # Тестовый набор данных
-test_file = 'datasets/test.csv'
+test_file4lab = 'datasets/test.csv'
+
+fw_dataset_file = 'datasets/adult.csv'
+
+fw_dataset_counter = 'fnlwgt'
+fw_dataset_divider = 500
+
+
 # Справочник методов с описанием для враппера
 func_description = {'init_datasets': 'Загрузка датасета', 'gradient': 'Вычисление градиентного бустинга',
                     'yandex': 'Вычисление  CatBoosting', 'ada_boost': 'Вычисление Ada Boost',
@@ -14,8 +20,7 @@ func_description = {'init_datasets': 'Загрузка датасета', 'gradi
                     'dumn_method': 'Фиктивный классификатор', 'SVM_method': 'SVM - линейное ядро'
                     }
 
-#Справочник гиперпараметров
+# Справочник гиперпараметров
 model_params = {'estimators': 300, 'depth': 7, 'learning_rate': 0.05, 'iterations': 300, 'verbose': 0,
-                    'max_features': 'sqrt', 'num_leaves': 31, 'eval_metric': 'logloss', 'strategy': "most_frequent",
-                    'loss_function': 'MultiClass', 'kernel': 'poly', 'n_neighbors': 6}
-
+                'max_features': 'sqrt', 'num_leaves': 31, 'eval_metric': 'logloss', 'strategy': "most_frequent",
+                'loss_function': 'MultiClass', 'kernel': 'poly', 'n_neighbors': 6}
