@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from pycaret.classification import *
 
-from util import time_logger, DLlogger
+from utils.util import time_logger, DLlogger
 import const.ds_const as CONST
 
 
