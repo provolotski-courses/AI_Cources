@@ -17,7 +17,7 @@ fw_dataset_file = 'datasets/adult.csv'
 # атрибут определяющий количество записей
 fw_dataset_counter = 'fnlwgt'
 # во сколько раз будем меньше генерировать записей
-fw_dataset_divider = 4000
+fw_dataset_divider = 1500
 # словарь обучаемых моделей
 fw_model_dict = {'к-ближайших':KNeighborsClassifier(n_neighbors=3),
                  'GradientBoosting': GradientBoostingClassifier(),
