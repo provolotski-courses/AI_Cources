@@ -6,7 +6,6 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from xgboost import XGBClassifier
 from sklearn.svm import SVC
 
-
 output_file = 'log/output.log'
 fw_output_file = 'report/dateset_output.log'
 # Тренировочный набор данных
