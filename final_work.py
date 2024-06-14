@@ -10,7 +10,6 @@ from utils.util import time_logger, DLlogger
 import const.ds_const as CONST
 
 
-
 @time_logger
 def load_dataset(filename):
     """Загрузка датасета из файла"""
@@ -59,8 +58,6 @@ def EDA_report(analyzed_dataset):
     return analyzed_dataset
 
 
-
-
 @time_logger
 def generate_dataframes(census_dataset, predict_attr):
     """Генерируем наборы данных для моделей """
@@ -84,6 +81,7 @@ def generate_dataframes(census_dataset, predict_attr):
     x_train_mean, y_train_mean = nm.fit_resample(x_train, y_train.ravel())
     print('После применения метода кол-во меток  1-го класса: {}'.format(sum(y_train_mean == 0)))
     return census_dataset, label_encoders, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test
+
 
 @time_logger
 def train_model(classifier, x_train, y_train, x_test, y_test, method, state):
@@ -122,16 +120,18 @@ if __name__ == '__main__':
             continue
         utils.util.create_rep_dir(predict_attr)
         utils.util.create_rep_dir(f'{predict_attr}/img')
-    # Проводим анализ Pycaret
+        # Проводим анализ Pycaret
         ds_utils.analyze_dataset.analyze_pycaret(census_dataset, predict_attr)
-    # Анализируем данные
+        # Анализируем данные
 
-    # Получаем наборы
-        census_dataset, le, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test = generate_dataframes(census_dataset, predict_attr)
+        # Получаем наборы
+        census_dataset, le, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test = generate_dataframes(
+            census_dataset, predict_attr)
         ds_utils.analyze_dataset.show_heatmap(census_dataset)
         ds_utils.analyze_dataset.show_histogram(census_dataset)
-        ds_utils.analyze_dataset.analyze_target(census_dataset,predict_attr,dict(zip(le[predict_attr].classes_, le[predict_attr].transform(le[predict_attr].classes_))))
-    # Обучаем модели
+        ds_utils.analyze_dataset.analyze_target(census_dataset, predict_attr, dict(
+            zip(le[predict_attr].classes_, le[predict_attr].transform(le[predict_attr].classes_))))
+        # Обучаем модели
         for method_name, classifier in CONST.fw_model_dict.items():
             train_model_dual(classifier, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test,
                              method_name)
