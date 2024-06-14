@@ -2,9 +2,10 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
-import ds_utils.analyze_dataset
-import utils.util
-from utils.util import time_logger, DLlogger
+from utils.util import time_logger, DLlogger,create_rep_dir
+from ds_utils import analyze_dataset, learning_model
+
+
 import const.ds_const as CONST
 
 
@@ -87,26 +88,26 @@ if __name__ == '__main__':
     print = log.printml
     # Получаем данные
     census_dataset = load_dataset(CONST.fw_dataset_file)
-    utils.util.create_rep_dir('img')
+    create_rep_dir('img')
     census_dataset = eda_report(census_dataset)
     # определяем целевой параметр
     for predict_attr in census_dataset.columns:
         if predict_attr in ['age']:
             continue
-        utils.util.create_rep_dir(predict_attr)
-        utils.util.create_rep_dir(f'{predict_attr}/img')
+        create_rep_dir(predict_attr)
+        create_rep_dir(f'{predict_attr}/img')
         # Проводим анализ Pycaret
-        ds_utils.analyze_dataset.analyze_pycaret(census_dataset, predict_attr)
+        analyze_dataset.analyze_pycaret(census_dataset, predict_attr)
         # Анализируем данные
 
         # Получаем наборы
         census_dataset, le, x_train, y_train, x_test, y_test = generate_dataframes(
             census_dataset, predict_attr)
-        ds_utils.analyze_dataset.show_heatmap(census_dataset)
-        ds_utils.analyze_dataset.show_histogram(census_dataset)
-        ds_utils.analyze_dataset.analyze_target(census_dataset, predict_attr, dict(
+        analyze_dataset.show_heatmap(census_dataset)
+        analyze_dataset.show_histogram(census_dataset)
+        analyze_dataset.analyze_target(census_dataset, predict_attr, dict(
             zip(le[predict_attr].classes_, le[predict_attr].transform(le[predict_attr].classes_))))
         # Обучаем модели
         for method_name, classifier in CONST.fw_model_dict.items():
-            train_model(classifier, x_train, y_train, x_test, y_test,
+            learning_model.train_model(classifier, x_train, y_train, x_test, y_test,
                         method_name)

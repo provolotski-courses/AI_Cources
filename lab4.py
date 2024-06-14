@@ -14,8 +14,10 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 
+
 from utils.util import time_logger, DLlogger
 import const.ds_const as CONST
+from ds_utils.learning_model import train_model
 
 
 # сразу определяю дата фреймы как глобальные, чтобы потом не перегружать
@@ -144,17 +146,7 @@ def init_separated_dataset():
     return x_train, x_test
 
 
-def learn_model(classifier, x_train, y_train, x_test, y_test, method):
-    """Обобщенный метод для обучения моделей"""
-    classifier.fit(x_train, y_train)  # Обучаем модель
-    y_pred = classifier.predict(x_test)  # Считаем предсказания
-    # Оценка модели
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    print(f' Report for {method} method')
-    print(f'Accuracy: {accuracy:.2f}')
-    print('Classification Report:')
-    print(report)
+
 
 
 @time_logger
@@ -162,7 +154,7 @@ def gradient(x_train, y_train, x_test, y_test, params):
     """Создание и обучение модели методом градиетного бустинга"""
     gb_classifier = GradientBoostingClassifier(n_estimators=params['estimators'], max_depth=params['depth'],
                                                learning_rate=params['learning_rate'], random_state=42)
-    learn_model(gb_classifier, x_train, y_train, x_test, y_test, 'GradientBoostingClassifier')
+    train_model(gb_classifier, x_train, y_train, x_test, y_test, 'GradientBoostingClassifier')
 
 
 @time_logger
@@ -171,7 +163,7 @@ def yandex(x_train, y_train, x_test, y_test, params):
     clf = CatBoostClassifier(iterations=params['iterations'], learning_rate=params['learning_rate'],
                              depth=params['depth'], random_state=100, verbose=params['verbose'],
                              loss_function=params['loss_function'])
-    learn_model(clf, x_train, y_train, x_test, y_test, 'CatBoostClassifier')
+    train_model(clf, x_train, y_train, x_test, y_test, 'CatBoostClassifier')
 
 
 @time_logger
@@ -180,7 +172,7 @@ def ada_boost(x_train, y_train, x_test, y_test, params):
     AdaBoostClassifier()
     ada_classifier = AdaBoostClassifier(n_estimators=params['estimators'], learning_rate=params['learning_rate'],
                                         random_state=42, algorithm='SAMME')
-    learn_model(ada_classifier, x_train, y_train, x_test, y_test, 'AdaBoostClassifier')
+    train_model(ada_classifier, x_train, y_train, x_test, y_test, 'AdaBoostClassifier')
 
 
 @time_logger
@@ -188,14 +180,14 @@ def extra_tree(x_train, y_train, x_test, y_test, params):
     """Создание и обучение классификатора Extra Trees"""
     clf = ExtraTreesClassifier(n_estimators=params['estimators'], max_features=params['max_features'],
                                random_state=42, )
-    learn_model(clf, x_train, y_train, x_test, y_test, 'ExtraTreesClassifier')
+    train_model(clf, x_train, y_train, x_test, y_test, 'ExtraTreesClassifier')
 
 
 @time_logger
 def sqr_boost(x_train, y_train, x_test, y_test):
     """Создание и обучение классификатора QDA"""
     clf = QuadraticDiscriminantAnalysis()
-    learn_model(clf, x_train, y_train, x_test, y_test, 'QuadraticDiscriminantAnalysis')
+    train_model(clf, x_train, y_train, x_test, y_test, 'QuadraticDiscriminantAnalysis')
 
 
 @time_logger
@@ -203,42 +195,42 @@ def LGBM_method(x_train, y_train, x_test, y_test, params):
     """Создание и обучение классификатора LGBM"""
     clf = lgb.LGBMClassifier(num_leaves=params['num_leaves'], learning_rate=params['learning_rate'],
                              n_estimators=params['estimators'])
-    learn_model(clf, x_train, y_train, x_test, y_test, 'LGBMClassifier')
+    train_model(clf, x_train, y_train, x_test, y_test, 'LGBMClassifier')
 
 
 @time_logger
 def KNN_method(x_train, y_train, x_test, y_test, params):
     """Создание и обучение классификатора ближайших к-соседей"""
     clf = KNeighborsClassifier(n_neighbors=params['n_neighbors'])
-    learn_model(clf, x_train, y_train, x_test, y_test, 'KNeighborsClassifier')
+    train_model(clf, x_train, y_train, x_test, y_test, 'KNeighborsClassifier')
 
 
 @time_logger
 def decision_tree_method(x_train, y_train, x_test, y_test):
     """Создание и обучение модели Decision Tree Classifier"""
     clf = DecisionTreeClassifier(random_state=42)
-    learn_model(clf, x_train, y_train, x_test, y_test, 'DecisionTreeClassifier')
+    train_model(clf, x_train, y_train, x_test, y_test, 'DecisionTreeClassifier')
 
 
 @time_logger
 def extremally_gradient_method(x_train, y_train, x_test, y_test, params):
     """Создание и обучение модели XGBoost"""
     clf = xgb.XGBClassifier(use_label_encoder=False, eval_metric=params['eval_metric'])
-    learn_model(clf, x_train, y_train, x_test, y_test, 'XGBClassifier')
+    train_model(clf, x_train, y_train, x_test, y_test, 'XGBClassifier')
 
 
 @time_logger
 def dumn_method(x_train, y_train, x_test, y_test, params):
     """Создание и обучение Dummy Classifier"""
     clf = DummyClassifier(strategy=params['strategy'])  # stratified
-    learn_model(clf, x_train, y_train, x_test, y_test, 'DummyClassifier')
+    train_model(clf, x_train, y_train, x_test, y_test, 'DummyClassifier')
 
 
 @time_logger
 def SVM_method(x_train, y_train, x_test, y_test, params):
     """Создание и обучение модели SVM"""
     clf = SVC(kernel=params['kernel'], random_state=42)  # альтернатива rbf, poly
-    learn_model(clf, x_train, y_train, x_test, y_test, 'SVC')
+    train_model(clf, x_train, y_train, x_test, y_test, 'SVC')
 
 
 def calc_all_methods(x_train, y_train, x_test, y_test):
