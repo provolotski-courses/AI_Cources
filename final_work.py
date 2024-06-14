@@ -132,6 +132,6 @@ if __name__ == '__main__':
         ds_utils.analyze_dataset.show_histogram(census_dataset)
         ds_utils.analyze_dataset.analyze_target(census_dataset,predict_attr,dict(zip(le[predict_attr].classes_, le[predict_attr].transform(le[predict_attr].classes_))))
     # Обучаем модели
-    #     for method_name, classifier in CONST.fw_model_dict.items():
-    #         train_model_dual(classifier, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test,
-    #                          method_name)
+        for method_name, classifier in CONST.fw_model_dict.items():
+            train_model_dual(classifier, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test,
+                             method_name)
