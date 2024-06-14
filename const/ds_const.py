@@ -6,8 +6,9 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from xgboost import XGBClassifier
 from sklearn.svm import SVC
 
+
 output_file = 'log/output.log'
-fw_output_file = 'log/final_output.log'
+fw_output_file = 'report/dateset_output.log'
 # Тренировочный набор данных
 train_file4lab = 'datasets/train.csv'
 # Тестовый набор данных
@@ -17,7 +18,7 @@ fw_dataset_file = 'datasets/adult.csv'
 # атрибут определяющий количество записей
 fw_dataset_counter = 'fnlwgt'
 # во сколько раз будем меньше генерировать записей
-fw_dataset_divider = 4000
+fw_dataset_divider = 120000
 # словарь обучаемых моделей
 fw_model_dict = {'к-ближайших':KNeighborsClassifier(n_neighbors=3),
                  'GradientBoosting': GradientBoostingClassifier(),

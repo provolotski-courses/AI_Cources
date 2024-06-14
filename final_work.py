@@ -3,10 +3,12 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
-from pycaret.classification import *
 
+import ds_utils.analyze_dataset
+import utils.util
 from utils.util import time_logger, DLlogger
 import const.ds_const as CONST
+
 
 
 @time_logger
@@ -57,21 +59,12 @@ def EDA_report(analyzed_dataset):
     return analyzed_dataset
 
 
-def analyze_pycaret(dataset, target):
-    s = setup(dataset, target=target)
-    print(s)
-    best = compare_models()
-    print(best)
-    evaluate_model(best)
-    plot_model(best, plot='auc', to_file='auc.png')
-    plot_model(best, plot='confusion_matrix',to_file='confusion_matrix.png')
-    plot_model(best, plot='class_report', to_file='class_report.png')
-    predict_model(best)
+
 
 @time_logger
 def generate_dataframes(census_dataset, predict_attr):
     """Генерируем наборы данных для моделей """
-    # убираем дисбаланс dataframe по показателю атрибута
+    # Убираем дисбаланс dataframe по показателю атрибута.
     # Применяем encoder для категориальных (не числовых) атрибутов
     categorical_columns = census_dataset.select_dtypes(include=['object']).columns.tolist()
     label_encoders = {}
@@ -81,6 +74,7 @@ def generate_dataframes(census_dataset, predict_attr):
         label_encoders[column] = le
     # определяем что целевой параметр
     y = census_dataset[predict_attr]
+
     # параметры для обучения - все кроме целевой
     x = census_dataset.drop(columns=[predict_attr])
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
@@ -89,7 +83,7 @@ def generate_dataframes(census_dataset, predict_attr):
     nm = NearMiss()
     x_train_mean, y_train_mean = nm.fit_resample(x_train, y_train.ravel())
     print('После применения метода кол-во меток  1-го класса: {}'.format(sum(y_train_mean == 0)))
-    return x_train_mean, y_train_mean, x_train, y_train, x_test, y_test
+    return census_dataset, label_encoders, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test
 
 @time_logger
 def train_model(classifier, x_train, y_train, x_test, y_test, method, state):
@@ -120,15 +114,24 @@ if __name__ == '__main__':
     print = log.printml
     # Получаем данные
     census_dataset = load_dataset(CONST.fw_dataset_file)
-    # определяем целевой параметр
-    predict_attr = 'marital.status'
-    # Проводим анализ Pycaret
-    analyze_pycaret(census_dataset, predict_attr)
-    # Анализируем данные
+    utils.util.create_rep_dir('img')
     census_dataset = EDA_report(census_dataset)
+    # определяем целевой параметр
+    for predict_attr in census_dataset.columns:
+        if predict_attr in ['age']:
+            continue
+        utils.util.create_rep_dir(predict_attr)
+        utils.util.create_rep_dir(f'{predict_attr}/img')
+    # Проводим анализ Pycaret
+        ds_utils.analyze_dataset.analyze_pycaret(census_dataset, predict_attr)
+    # Анализируем данные
+
     # Получаем наборы
-    x_train_mean, y_train_mean, x_train, y_train, x_test, y_test = generate_dataframes(census_dataset, predict_attr)
+        census_dataset, le, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test = generate_dataframes(census_dataset, predict_attr)
+        ds_utils.analyze_dataset.show_heatmap(census_dataset)
+        ds_utils.analyze_dataset.show_histogram(census_dataset)
+        ds_utils.analyze_dataset.analyze_target(census_dataset,predict_attr,dict(zip(le[predict_attr].classes_, le[predict_attr].transform(le[predict_attr].classes_))))
     # Обучаем модели
-    for method_name, classifier in CONST.fw_model_dict.items():
-        train_model_dual(classifier, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test,
-                         method_name)
+    #     for method_name, classifier in CONST.fw_model_dict.items():
+    #         train_model_dual(classifier, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test,
+    #                          method_name)

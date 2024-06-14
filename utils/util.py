@@ -1,7 +1,8 @@
+import shutil
 import time
 from datetime import datetime
 import const.ds_const as CONST
-
+import os
 
 class DLlogger(object):
     """Логгер для вывода в файл"""
@@ -36,3 +37,9 @@ def time_logger(func):
 
     return wrap
 
+def create_rep_dir(target):
+    if not os.path.exists(f'report/{target}'):
+        os.makedirs(f'report/{target}')
+
+def move_files(filename, target):
+    shutil.move(filename, f'report/{target}/img/{filename}')
