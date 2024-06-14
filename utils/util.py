@@ -4,12 +4,15 @@ from datetime import datetime
 import const.ds_const as CONST
 import os
 
+
 class DLlogger(object):
     """Логгер для вывода в файл"""
+
     def __init__(self, fn='', tofile=False):
-	    self.fn = fn
-	    self.tofile = tofile
-	    return
+        self.fn = fn
+        self.tofile = tofile
+        return
+
     def printml(self, *args):
         toprint = ''
         for v in args:
@@ -18,9 +21,9 @@ class DLlogger(object):
             f = open(self.fn, 'a')
             f.write(toprint + "\n")
             f.close()
-        else: print(toprint)
+        else:
+            print(toprint)
         return
-
 
 
 def time_logger(func):
@@ -37,9 +40,11 @@ def time_logger(func):
 
     return wrap
 
+
 def create_rep_dir(target):
     if not os.path.exists(f'report/{target}'):
         os.makedirs(f'report/{target}')
+
 
 def move_files(filename, target):
     shutil.move(filename, f'report/{target}/img/{filename}')
