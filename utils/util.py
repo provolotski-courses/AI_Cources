@@ -30,6 +30,8 @@ def time_logger(func):
     """Простой декоратор, нужен только для логирования времени."""
 
     def wrap(*args, **kwargs):
+        log = DLlogger(CONST.fw_output_file, True)
+        print = log.printml
         start = time.time()
         print(f'Выполнение функции "{CONST.func_description[func.__name__]}" начало:{datetime.now()}')
         result = func(*args, **kwargs)
