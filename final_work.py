@@ -1,13 +1,12 @@
-from imblearn.under_sampling import NearMiss
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
 
 import ds_utils.analyze_dataset
 import utils.util
 from utils.util import time_logger, DLlogger
 import const.ds_const as CONST
+
 
 
 @time_logger
@@ -36,7 +35,7 @@ def load_dataset(filename):
 
 
 @time_logger
-def EDA_report(analyzed_dataset):
+def eda_report(analyzed_dataset):
     """Проведение EDA-анализа над переданным датасетом"""
     """Вывод статистики по дата фрейму"""
     print('***---- head  ------***')
@@ -59,51 +58,27 @@ def EDA_report(analyzed_dataset):
 
 
 @time_logger
-def generate_dataframes(census_dataset, predict_attr):
+def generate_dataframes(census_ds, predict_attr_df):
     """Генерируем наборы данных для моделей """
     # Убираем дисбаланс dataframe по показателю атрибута.
     # Применяем encoder для категориальных (не числовых) атрибутов
-    categorical_columns = census_dataset.select_dtypes(include=['object']).columns.tolist()
+    categorical_columns = census_ds.select_dtypes(include=['object']).columns.tolist()
     label_encoders = {}
     for column in categorical_columns:
         le = LabelEncoder()
-        census_dataset[column] = le.fit_transform(census_dataset[column])
+        census_ds[column] = le.fit_transform(census_ds[column])
         label_encoders[column] = le
     # определяем что целевой параметр
-    y = census_dataset[predict_attr]
+    y = census_ds[predict_attr_df]
 
     # параметры для обучения - все кроме целевой
-    x = census_dataset.drop(columns=[predict_attr])
+    x = census_ds.drop(columns=[predict_attr_df])
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
-    print('До применения метода кол-во меток 1-го класса: {}'.format(sum(y_train == 0)))
-    # применяем балансировку
-    nm = NearMiss()
-    x_train_mean, y_train_mean = nm.fit_resample(x_train, y_train.ravel())
-    print('После применения метода кол-во меток  1-го класса: {}'.format(sum(y_train_mean == 0)))
-    return census_dataset, label_encoders, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test
+
+    return census_ds, label_encoders, x_train, y_train, x_test, y_test
 
 
-@time_logger
-def train_model(classifier, x_train, y_train, x_test, y_test, method, state):
-    """Обучение модели """
-    clf = classifier
-    clf.fit(x_train, y_train)
-    y_pred = clf.predict(x_test)  # Считаем предсказания
-    # Оценка модели
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    print(f' Report for {method} method. {state} model')
-    print(f'Accuracy: {accuracy:.2f}')
-    print('Classification Report:')
-    print(report)
 
-
-def train_model_dual(classifier, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test, method):
-    """Обучаем две модели на несбалансированной и на сбалансированной модели"""
-    # несбалансированная
-    train_model(classifier, x_train, y_train, x_test, y_test, method, 'disbalanced')
-    # сбалансированная
-    train_model(classifier, x_train_mean, y_train_mean, x_test, y_test, method, 'balanced')
 
 
 if __name__ == '__main__':
@@ -113,7 +88,7 @@ if __name__ == '__main__':
     # Получаем данные
     census_dataset = load_dataset(CONST.fw_dataset_file)
     utils.util.create_rep_dir('img')
-    census_dataset = EDA_report(census_dataset)
+    census_dataset = eda_report(census_dataset)
     # определяем целевой параметр
     for predict_attr in census_dataset.columns:
         if predict_attr in ['age']:
@@ -125,7 +100,7 @@ if __name__ == '__main__':
         # Анализируем данные
 
         # Получаем наборы
-        census_dataset, le, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test = generate_dataframes(
+        census_dataset, le, x_train, y_train, x_test, y_test = generate_dataframes(
             census_dataset, predict_attr)
         ds_utils.analyze_dataset.show_heatmap(census_dataset)
         ds_utils.analyze_dataset.show_histogram(census_dataset)
@@ -133,5 +108,5 @@ if __name__ == '__main__':
             zip(le[predict_attr].classes_, le[predict_attr].transform(le[predict_attr].classes_))))
         # Обучаем модели
         for method_name, classifier in CONST.fw_model_dict.items():
-            train_model_dual(classifier, x_train_mean, y_train_mean, x_train, y_train, x_test, y_test,
-                             method_name)
+            train_model(classifier, x_train, y_train, x_test, y_test,
+                        method_name)
